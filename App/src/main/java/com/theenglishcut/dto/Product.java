@@ -12,7 +12,7 @@ public class Product {
     private double price;
     private String image;
     //inventario
-    private int quantity;
+    private Stock stock;
     private List<Integer> categories;
     private List<Integer> orders;
 }

@@ -30,124 +30,23 @@ public class ProductController {
     @Autowired
     private ProductoACategoriaRepository productoACategoriaRepository;
 
-    @Autowired
-    private RolRepository rolRepository;
-
-    private String categoriaGlobal;
-
-
-    /**
-     * Devuelve la pagina login para acceder con un usuario
-     * @return login.jsp
-     */
-    @GetMapping("/login")
-    public String doLogin () {
-        return "/login";
-    }
-
-    @PostMapping("/loginUser")
-    public String login(Model modelo,@RequestParam(value = "nombre",required = false)String user, @RequestParam(value = "password",required = false)String password, HttpSession sesion){
-
-        UserEntity userEntity = usuarioRepository.findByNombreUser(user);
-
-        if(user == null){
-            modelo.addAttribute("error","no existe ese usuario, prueba a registrarte antes de hacer login");
-            return "/error?tipo=login";
-        }else if(password == null || !password.equals(userEntity.getPassword())){
-            modelo.addAttribute("error","la contraseña no coincide, prueba a prueba otra contraseña para hacer login hacer login");
-            return "/error?tipo=login";
-        }
-
-        sesion.setAttribute("user", userEntity);
-
-        categoriaGlobal = "TODO";
-        //TODO el carrito debe estar vacio cuanddo un nuevo usuario se logee
-        //productosCarrito.clear();
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/register")
-    public String doRegister (HttpSession sesion, Model modelo  ) {
-
-        String user = (String) sesion.getAttribute("user");
-        UserEntity userEntity = usuarioRepository.findByNombreUser(user);
-
-        if(userEntity != null && userEntity.getRol().getNombre().equals("Administrador")){
-            modelo.addAttribute("roles", rolRepository.findAll());
-        }
-        return "/register";
-    }
-
-    @PostMapping("/registerUser")
-    public String register(HttpSession sesion, Model modelo, @RequestParam(value = "nombre",required = false)String user, @RequestParam(value = "password",required = false)String password, @RequestParam(value="rolId")Integer rolId){
-
-        UserEntity userEntity = usuarioRepository.findByNombreUser(user);
-
-        if(userEntity != null){
-            modelo.addAttribute("error","ya existe ese usuario, prueba a registrarte con otro nombre de usuario");
-            return "redirect:/error?tipo=register";
-        }
-
-        userEntity = new UserEntity();
-
-        userEntity.setNombre(user);
-        userEntity.setPassword(password);
-
-        userEntity.setRol(rolRepository.findById(rolId).get());
-        usuarioRepository.save(userEntity);
-
-        //designamoos como el nuevo usuario en uso para la web
-        sesion.setAttribute("user", userEntity);
-
-        categoriaGlobal = "TODO";
-        //TODO el carrito debe estar vacio cuanddo un nuevo usuario se registre
-        //productosCarrito.clear();
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/logout")
-    public String logout (HttpSession sesion) {
-
-        sesion.setAttribute("user",null);
-
-        categoriaGlobal = "TODO";
-
-        return "redirect:/";
-    }
-
-    @GetMapping("/error")
-    public String doError (@RequestParam("tipo")String tipo, Model modelo) {
-        modelo.addAttribute("tipo",tipo);
-        return "/error";
-    }
-
-    /**
-     * Metodo que devuelve el incio de la página
-     * @return home.jsp
-     */
-    @GetMapping("/")
-    public String doInicio (HttpSession sesion) {
-        List<CategoryEntity> categoryEntityList = categoriaRepository.findAll();
-        List<String> lista = new ArrayList<>();
-
-        for(CategoryEntity categoryEntity : categoryEntityList){
-            lista.add(categoryEntity.getNombre());
-        }
-
-        sesion.setAttribute("listaCategoriasNombres", lista);
-        return "/home";
-    }
+    private Integer categoriaGlobal;
 
     /**
      * Devuelve el listado de productos de la web
      * @return listadoProductos.jsp
      */
     @GetMapping("/listadoProductos")
-    public String verProductos (Model model, @RequestParam("Categoria") String categoria) {
+    public String verProductos (Model model, @RequestParam("CategoryID") Integer categoryID) {
+        List<ProductEntity> productEntityList;
+        if(categoryID == 0){
+            categoriaGlobal = 0;
+            productEntityList = productoRepository.findAll();
+        }else {
+            categoriaGlobal = categoryID;
+            productEntityList = productoRepository.findByCategoryID(categoryID);
+        }
 
-        List<ProductEntity> productEntityList = buscarProductosFiltro(categoria);
         if(productEntityList.isEmpty()){
             model.addAttribute("mensaje", "No hay productos");
         }
@@ -155,47 +54,11 @@ public class ProductController {
         model.addAttribute("products", productEntityList);
         return "/listadoProductos";
     }
-
-    private List<ProductEntity> buscarProductosFiltro(String categoria) {
-
-        List<ProductEntity> aux = productoRepository.findAll();
-        List<ProductEntity> productEntityList = new ArrayList<>();
-        categoriaGlobal= categoria;
-        boolean anadir = false;
-
-        if(categoria.equals("TODO")){
-            productEntityList = aux;
-        }else{
-
-            for(ProductEntity p:aux){
-                for(ProductToCategoryEntity c:p.getCategorias()){
-                    if(c.getCategoria().getNombre().equals(categoria)){
-                        anadir = true;
-                        break;
-                    }
-                }
-                if(anadir){
-                    productEntityList.add(p);
-                    anadir = false;
-                }
-            }
-        }
-
-        return productEntityList;
-    }
-
     @GetMapping("/Navbar")
-    public String verCategorias (Model model) {
+    public String verCategorias (HttpSession sesion) {
 
-        List<CategoryEntity> categoryEntityList = categoriaRepository.findAll();
-        List<String> lista = new ArrayList<>();
-
-        for(CategoryEntity categoryEntity : categoryEntityList){
-            lista.add(categoryEntity.getNombre());
-        }
-
-
-        model.addAttribute("listaCategoriasNombres", lista);
+        List<CategoryEntity> categoryList = categoriaRepository.findAll();
+        sesion.setAttribute("categoryListView", categoryList);
         return "/Navbar";
     }
 
@@ -240,12 +103,12 @@ public class ProductController {
         ProductEntity productEntity = productoRepository.findById(id).orElse(null);
         if(productEntity == null){
             System.out.println("ningun producto eliminado, no deberia ser null el producto");
-            return "redirect:/listadoProductos?Categoria="+categoriaGlobal;
+            return "redirect:/listadoProductos?CategoryID="+categoriaGlobal;
         }
         productoACategoriaRepository.deleteByProductID(id);
         productoRepository.deleteById(id);
         inventarioRepository.deleteById(productEntity.getInventario().getID());
-        return "redirect:/listadoProductos?Categoria="+categoriaGlobal;
+        return "redirect:/listadoProductos?CategoryID="+categoriaGlobal;
     }
 
     @PostMapping("/guardarProducto")
@@ -272,7 +135,7 @@ public class ProductController {
             GuardarObjetoProducto(producto, productEntityNuevo);
 
         }
-        return "redirect:/listadoProductos?Categoria="+categoriaGlobal;
+        return "redirect:/listadoProductos?CategoryID="+categoriaGlobal;
     }
 
     private void GuardarObjetoProducto(@ModelAttribute("producto") producto producto, ProductEntity productEntityNuevo) {

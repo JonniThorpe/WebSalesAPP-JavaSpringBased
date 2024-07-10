@@ -1,5 +1,6 @@
 <%@ page import="com.theenglishcut.entity.RolEntity" %>
 <%@ page import="java.util.List" %>
+<%@ page import="com.theenglishcut.entity.UserEntity" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
@@ -7,9 +8,10 @@
 <%@ include file="../../bootstrap/css-js.jsp"%>
 <%
 
-    String tipo = (String)session.getAttribute("tipo");
-    if(tipo == null){
-        tipo = "Usuario";
+    UserEntity user = (UserEntity)session.getAttribute("user");
+    String tipo = "User";
+    if(user != null){
+        tipo = user.getRol().getNombre();
     }
     List<RolEntity> roles = (List<RolEntity>) request.getAttribute("roles");
 %>
@@ -67,7 +69,7 @@
                     <input name="password" type="password" class="form-control" placeholder="Password" aria-label="Password" aria-describedby="addon-wrapping">
                 </div>
             </div>
-            <%if(tipo.equals("Administrador")){%>
+            <%if(tipo.equals("Admin")){%>
                 <%for(RolEntity rol:roles){%>
                 <input name="rolId" type="radio" id="rol" value="<%=rol.getID()%>">
                 <label for="rol"><%=rol.getNombre()%></label>

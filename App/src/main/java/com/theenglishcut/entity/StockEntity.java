@@ -1,7 +1,9 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.Stock;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,5 +42,15 @@ public class StockEntity {
     private List<ProductEntity> productos;
 
     // getters and setters
+
+    public Stock toDTO(){
+        Stock stock = new Stock();
+        stock.setId(this.ID);
+        stock.setQuantity(this.cantidad);
+        List<Integer> productList = new ArrayList<Integer>();
+        this.productos.forEach((final ProductEntity product) -> productList.add(product.getID()));
+        stock.setProducts(productList);
+        return stock;
+    }
 }
 

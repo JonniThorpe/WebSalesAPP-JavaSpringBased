@@ -1,7 +1,9 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.Product;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -90,6 +92,32 @@ public class ProductEntity {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public Product toDTO(){
+        Product product = new Product();
+        product.setId(this.ID);
+        product.setName(this.nombre);
+        product.setDescription(this.descripcion);
+        product.setPrice(this.precio);
+        product.setImage(this.imagen);
+        product.setStock(this.inventario.toDTO());
+
+        List<Integer> ordersList = new ArrayList<Integer>();
+        this.pedidos.forEach(
+                (final ProductToOrderEntity productToOrder)->
+                        ordersList.add(productToOrder.getPedido().getID())
+        );
+        product.setOrders(ordersList);
+        List<Integer> categoryList = new ArrayList<Integer>();
+        this.categorias.forEach(
+                (final ProductToCategoryEntity productToCategory)->
+                        categoryList.add(productToCategory.getCategoria().getID())
+        );
+        product.setCategories(categoryList);
+
+        return product;
+
     }
 
 }

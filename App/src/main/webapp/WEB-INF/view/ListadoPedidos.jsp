@@ -30,7 +30,7 @@
 <%@ include file = "../componentes/Navbar.jsp" %>
 <%if(!orders.isEmpty()){%>
     <div class="container mt-3">
-        <%if(tipoUsuario.equals("Administrador")){%>
+        <%if(tipoUsuario.equals("Admin")){%>
         <div>
             <form action="filtrar" method="post" >
                 <label for="clientes">Nombre del cliente</label>

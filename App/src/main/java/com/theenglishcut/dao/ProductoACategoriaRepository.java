@@ -7,9 +7,14 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 public interface ProductoACategoriaRepository extends JpaRepository<ProductToCategoryEntity,Integer> {
     @Query("delete ProductToCategoryEntity pc where pc.producto.ID = :id ")
     @Modifying
     @Transactional
     void deleteByProductID(@Param("id") Integer id);
+
+    @Query("select pc from ProductToCategoryEntity pc where pc.producto.ID = :id")
+    public List<ProductToCategoryEntity> findProductToCategoryByProductID(Integer id);
 }
