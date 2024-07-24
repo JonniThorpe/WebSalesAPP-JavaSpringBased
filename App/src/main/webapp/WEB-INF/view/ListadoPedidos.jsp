@@ -68,8 +68,11 @@
                         </ul>
                     </td>
                     <td><%=orderEntity.getFechaCreacion().toString()%></td>
-                    <td><%=orderEntity.getEntrega()%></td>
-                    <td></td>
+                    <%if(orderEntity.isEntregaCompletada()){%>
+                    <td>Entrega completada</td>
+                    <%}else{%>
+                    <td>Entrega no completada</td>
+                    <%}%>
                 </tr>
                 <%}%>
         </table>

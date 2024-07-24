@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -42,6 +43,7 @@ public class OrdersController {
         }
 
         if(ordersList == null || ordersList.isEmpty()){
+            ordersList  = new ArrayList<>();
             model.addAttribute("mensaje", "No hay pedidos");
         }
         model.addAttribute("orders", ordersList);

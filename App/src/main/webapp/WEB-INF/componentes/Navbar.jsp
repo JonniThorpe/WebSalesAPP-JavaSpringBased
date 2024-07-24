@@ -2,6 +2,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="com.theenglishcut.entity.UserEntity" %>
 <%@ page import="com.theenglishcut.entity.CategoryEntity" %>
+<%@ page import="com.theenglishcut.dto.Category" %>
 
 
 <%
@@ -11,7 +12,7 @@
         tipo = user.getRol().getNombre();
     }
 
-    List<CategoryEntity> categoryListView = (List<CategoryEntity>) session.getAttribute("categoryListView");
+    List<Category> categoryListView = (List<Category>) session.getAttribute("categoryListView");
 %>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -41,8 +42,8 @@
                     </a>
                     <ul class="dropdown-menu">
                         <%if(categoryListView != null){ %>
-                            <%for(CategoryEntity categoryEntity:categoryListView){%>
-                                <li><a class="dropdown-item" href="/listadoProductos?CategoryID=<%=categoryEntity.getID()%>"> <%=categoryEntity.getNombre()%> </a></li>
+                            <%for(Category categoryEntity:categoryListView){%>
+                                <li><a class="dropdown-item" href="/listadoProductos?CategoryID=<%=categoryEntity.getId()%>"> <%=categoryEntity.getName()%> </a></li>
                                 <li><hr class="dropdown-divider"></li>
                             <%}%>
                         <%}%>

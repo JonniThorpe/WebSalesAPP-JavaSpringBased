@@ -1,15 +1,9 @@
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <%@ taglib prefix="from" uri="http://www.springframework.org/tags/form" %>
-<%@ page import="com.theenglishcut.entity.CategoryEntity" %>
-<%@ page import="com.theenglishcut.entity.CategoryEntity" %>
-<%@ page import="com.theenglishcut.entity.ProductEntity" %>
-<%@ page import="com.theenglishcut.ui.producto" %>
+<%@ page import="com.theenglishcut.dto.Product" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%
-
-    producto producto = (com.theenglishcut.ui.producto) request.getAttribute("producto");
-    List<CategoryEntity> categorias = (List<CategoryEntity>) request.getAttribute("categorias");
-
+    Integer quantity = (Integer) request.getAttribute("quantity");
 %>
 <html>
 <head>
@@ -20,40 +14,44 @@
 <%@ include file = "../componentes/Navbar.jsp" %>
 <h1 align="center">CREAR PRODUCTO</h1>
 <div class="container-sm">
-    <form:form action="/guardarProducto" method="post" modelAttribute="producto">
-        <form:hidden path="idProducto"/>
+    <form:form action="/guardarProducto" method="post" modelAttribute="product">
+        <form:hidden path="id"/>
         <div class="mb-3">
             <label >Nombre del productEntity</label>
-            <from:input path="nombre" class="col-md-8 form-control input-md"/>
+            <from:input path="name" class="col-md-8 form-control input-md"/>
         </div>
         <div class="mb-3">
-            <label for="descripcionProducto">Descripcion del productEntity</label>
-            <form:textarea id="descripcionProducto" path="descripcion" class="form-control" rows="3"></form:textarea>
+            <label for="description">Descripcion del productEntity</label>
+            <form:textarea id="description" path="description" class="form-control" rows="3"></form:textarea>
         </div>
         <div>
-            <label for="categoriasID">Categorias Disponibles</label>
-            <form:select id="categoriasID" path="categorias" items="${categorias}" itemLabel="nombre" itemValue="ID" multiple="true"/>
+            <label for="categoriesID">Categorias Disponibles</label>
+            <form:select id="categoriesID" path="categories" items="${categories}" itemLabel="name" itemValue="id" multiple="true"/>
         </div>
         <div class="mb-3">
-            <label>Precio del productEntity</label>
-            <form:input path="precio" class="col-md-8 form-control input-md" />
+            <label>Precio del producto</label>
+            <form:input path="price" class="col-md-8 form-control input-md" />
         </div>
+        <form:hidden path="stock.id"/>
         <div class="form-group mb-3">
             <label for="cantidadProducto">Cantidad</label>
-            <form:select path="cantidad" class="form-control" id="cantidadProducto">
+            <select name="quantity" class="form-control" id="cantidadProducto">
                 <%--TODO set selected cantidad--%>
                 <%
                 for (int i = 0; i < 100; i++) {
                 String selected = "";
+                if(i==quantity){
+                    selected = "selected";
+                }
                     %>
-                <option value="<%=i%>"><%=i%></option>
+                <option value="<%=i%>" <%=selected%>><%=i%></option>
                          <%
                     }%>
-            </form:select>
+            </select>
         </div>
         <div class="form-group mb-3">
             <label >Imagen</label>
-            <form:input path="imagen" type="text" class="form-control" />
+            <form:input path="image" type="text" class="form-control" />
         </div>
         <div class="input-group flex-nowrap mb-3">
             <button type="submit" class="btn btn-primary" >Enviar</button>

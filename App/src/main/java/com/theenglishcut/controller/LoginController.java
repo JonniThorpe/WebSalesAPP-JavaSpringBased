@@ -1,8 +1,10 @@
 package com.theenglishcut.controller;
 
 import com.theenglishcut.dao.*;
+import com.theenglishcut.dto.Category;
 import com.theenglishcut.entity.CategoryEntity;
 import com.theenglishcut.entity.UserEntity;
+import com.theenglishcut.service.CategoryService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,9 @@ public class LoginController {
 
     @Autowired
     private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private CategoryService categoryService;
 
     @Autowired
     private RolRepository rolRepository;
@@ -125,7 +130,7 @@ public class LoginController {
      */
     @GetMapping("/")
     public String doInicio (HttpSession sesion) {
-        List<CategoryEntity> categoryList = categoriaRepository.findAll();
+        List<Category> categoryList = categoryService.findAll();
         sesion.setAttribute("categoryListView", categoryList);
         return "/home";
     }

@@ -1,11 +1,14 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.Category;
+import com.theenglishcut.dto.DTO;
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class CategoryEntity {
+public class CategoryEntity implements DTO<Category> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID;
@@ -47,6 +50,22 @@ public class CategoryEntity {
 
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
+    }
+
+    @Override
+    public Category toDTO() {
+        Category category = new Category();
+        category.setId(this.ID);
+        category.setName(this.nombre);
+        category.setDescription(this.descripcion);
+        List<Integer> productList = new ArrayList<Integer>();
+        this.productos.forEach(
+                (final ProductToCategoryEntity productToCategory)->
+                        productList.add(productToCategory.getProducto().getID())
+        );
+        category.setProducts(productList);
+
+        return category;
     }
 }
 

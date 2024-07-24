@@ -1,16 +1,18 @@
 package com.theenglishcut.service;
 
 import com.theenglishcut.dao.*;
+import com.theenglishcut.dto.DTO;
 import com.theenglishcut.dto.Product;
-import com.theenglishcut.entity.CategoryEntity;
+import com.theenglishcut.dto.Stock;
 import com.theenglishcut.entity.ProductEntity;
+import com.theenglishcut.entity.StockEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ProductService extends DTOService<Product, ProductEntity>{
+public class ProductService extends DTOService<Product, ProductEntity> {
     @Autowired
     protected ProductoRepository productRepository;
     @Autowired
@@ -20,7 +22,9 @@ public class ProductService extends DTOService<Product, ProductEntity>{
     @Autowired
     protected ProductoACategoriaRepository productToCategoryRepository;
     @Autowired
-    protected PedidoAProductoRepository orderToProductRepository;
+    protected ProductoAPedidoRepository orderToProductRepository;
+    @Autowired
+    private InventarioRepository inventarioRepository;
     //List of prodructs
 
     public List<Product> listedProducts (){
@@ -46,16 +50,30 @@ public class ProductService extends DTOService<Product, ProductEntity>{
         }
     }
 
-    public void saveProduct(Product product){
+    public void saveProduct(Product product, Integer quantity){
         ProductEntity productEntity = this.productRepository.findById(product.getId()).orElse(new ProductEntity());
         productEntity.setNombre(product.getName());
         productEntity.setDescripcion(product.getDescription());
         productEntity.setImagen(product.getImage());
         productEntity.setPrecio(product.getPrice());
-        productEntity.setInventario(this.stockRepository.findById(product.getStock().getId()).orElse(null));
+
+        //Crea el inventario si el producto no existe
+        if(productEntity.getID() == null){
+            saveStock(productEntity, new StockEntity(), quantity);
+
+        }else{//actualiza el inventario ya existente si el producto existe
+            StockEntity stock = this.stockRepository.findById(product.getStock().getId()).orElse(null);
+            saveStock(productEntity, stock, quantity);
+        }
         productEntity.setCategorias(this.productToCategoryRepository.findProductToCategoryByProductID(product.getId()));
         productEntity.setPedidos(this.orderToProductRepository.findProductToOrderByProductID(product.getId()));
 
         this.productRepository.save(productEntity);
+    }
+
+    private void saveStock(ProductEntity productEntity, StockEntity stock, Integer quantity){
+        stock.setCantidad(quantity);
+        inventarioRepository.save(stock);
+        productEntity.setInventario(stock);
     }
 }

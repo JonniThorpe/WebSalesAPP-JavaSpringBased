@@ -2,16 +2,16 @@ package com.theenglishcut.controller;
 
 import com.theenglishcut.dao.*;
 import com.theenglishcut.entity.*;
+import com.theenglishcut.ui.productQuantity;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 @RequestMapping("Basket")
@@ -26,7 +26,7 @@ public class BasketController {
     @Autowired
     private ProductoRepository productoRepository;
     @Autowired
-    private PedidoAProductoRepository PedidoaProductoRepository;
+    private ProductoAPedidoRepository PedidoaProductoRepository;
 
     Map<ProductEntity,Integer> productosCarrito= new Hashtable<>();
     private OrderEntity orderEntityCliente = new OrderEntity();
@@ -45,24 +45,47 @@ public class BasketController {
         if(!existe){
             productosCarrito.put(productEntity_meter,1);
         }
-        return "redirect:/listadoProductos?Categoria=TODO";
+        return "redirect:/listadoProductos?CategoryID=0";
     }
 
     @GetMapping("/confirmarPedidoCliente")
     public String confirmarPedidoCliente (Model model) {
         model.addAttribute("productosCarrito", productosCarrito);
+        model.addAttribute("productQuantity", new productQuantity());
+
+        model.addAttribute("quantityOptions", IntStream.rangeClosed(0, 64).boxed().collect(Collectors.toList()));
         return "/Carrito";
+    }
+
+    @PostMapping("/modifyBasketProduct")
+    public String modifyBasketProduct(@ModelAttribute("productQuantity") productQuantity productQuantity) {
+        // Lógica para manejar la modificación del producto en el carrito
+        for(ProductEntity productEntity : productosCarrito.keySet()){
+            if(productEntity.getID().equals(productQuantity.getProductId())){
+                productosCarrito.put(productEntity,productQuantity.getQuantity());
+            }
+        }
+        return "redirect:/Basket/confirmarPedidoCliente"; // Redirigir después de manejar la solicitud
+    }
+    @GetMapping("/deleteProduct")
+    public String delete_Product(@RequestParam("idProduct")Integer idProduct) {
+        for(ProductEntity productEntity : productosCarrito.keySet()){
+            if(productEntity.getID().equals(idProduct)){
+                productosCarrito.remove(productEntity);
+            }
+        }
+        return "redirect:/Basket/confirmarPedidoCliente";
     }
 
     @PostMapping("/confirmarPedido")
     public String confirmar_Producto_a_Pedido (HttpSession sesion) {
 
-        String user = (String) sesion.getAttribute("user");
+        UserEntity user = (UserEntity) sesion.getAttribute("user");
         if (user == null) {
             // Manejar el caso en que el usuario no esté autenticado
             return "redirect:/login"; // Redirigir a la página de inicio de sesión
         }
-        UserEntity clientePedido = usuarioRepository.findByNombreUser(user);
+        UserEntity clientePedido = usuarioRepository.findByNombreUser(user.getNombre());
 
 
         List<ProductToOrderEntity> productoaPedidoLista = new ArrayList<>();
@@ -71,7 +94,7 @@ public class BasketController {
         //Creamos el pedido
         orderEntityCliente.setUsuario(clientePedido);
         orderEntityCliente.setFechaCreacion(new Date());
-        orderEntityCliente.setEntrega("NO CONFIRMADO");
+        orderEntityCliente.setEntregaCompletada(false);
         pedidoRepository.save(orderEntityCliente);
 
 
@@ -109,7 +132,7 @@ public class BasketController {
 
         orderEntityCliente = new OrderEntity();
 
-        return "redirect:/listadoProductos?Categoria=TODO";
+        return "redirect:/listadoProductos?CategoryID=0";
     }
 
 }

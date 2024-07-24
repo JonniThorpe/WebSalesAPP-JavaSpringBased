@@ -1,13 +1,15 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.DTO;
 import com.theenglishcut.dto.Stock;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class StockEntity {
+public class StockEntity implements DTO<Stock> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID;

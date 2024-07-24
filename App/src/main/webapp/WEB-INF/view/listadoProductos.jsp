@@ -1,10 +1,11 @@
 <%@ page import="com.theenglishcut.entity.ProductEntity" %>
 <%@ page import="java.util.List" %>
 <%@ page import="com.theenglishcut.entity.ProductEntity" %>
+<%@ page import="com.theenglishcut.dto.Product" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
 <%
-    List<ProductEntity> products = (List<ProductEntity>) request.getAttribute("products");
+    List<Product> products = (List<Product>) request.getAttribute("products");
 
     String mensaje = (String) request.getAttribute("mensaje");
 
@@ -19,7 +20,7 @@
     <%@ include file = "../componentes/Navbar.jsp" %>
 
     <div class="p-5">
-        <h1>Nuestra mejor coleccion productoss</h1>
+        <h1>Nuestra mejor coleccion productos</h1>
         <label>
             De esa forma, comúnmente podemos decir que un jamón 'pata negra'
             es aquel que procede de cerdos ibéricos 100% bellota, aunque es mucho
@@ -31,7 +32,7 @@
                 <img src="../../iconos/info.png" class="img-thumbnail" alt="...">
                 <div>
                     <p>
-                        No olvide hacer <b>Login</b> para poder realizar orderEntities en nuestra web
+                        No olvide hacer <b>Login</b> para poder realizar pedidos en nuestra web
                     </p>
 
                 </div>
@@ -40,42 +41,42 @@
         <%} else if (tipo.equals("User")) {%>
         <div>
             <p>
-                <br/><b>pulse el boton asignar productEntity y luego en el icono carrito podra realizar su orderEntity.
+                <br/><b>pulse el boton asignar productEntity y luego en el icono carrito podra realizar su pedido.
                 !Gracias!</b>
             </p>
         </div>
         <%}%>
         <%if(tipo.equals("Admin")){%>
         <div>
-            <a name="crearProducto" class="btn btn-primary" href="/CrearProducto">crear Producto</a>
+            <a name="crearProducto" class="btn btn-primary" href="/CrearProducto">crear producto</a>
         </div>
         <%}%>
     </div>
     <%if(!products.isEmpty()){%>
     <div class="container text-center">
         <div class="row row-cols-xxl-4">
-            <% for (ProductEntity productEntity : products) {%>
+            <% for (Product productEntity : products) {%>
             <div class="col mt-4">
                 <div class="card " style="width: 18rem;">
-                    <a href="/Detail?id=<%=productEntity.getID()%>">
-                        <img src="../../img/productos/<%=productEntity.getImagen()%>" class="card-img-top" alt="...">
+                    <a href="/Detail?id=<%=productEntity.getId()%>">
+                        <img src="../../img/productos/<%=productEntity.getImage()%>" class="card-img-top" alt="...">
                     </a>
                     <div class="card-body">
-                        <h5 class="card-title"><%=productEntity.getNombre()%></h5>
+                        <h5 class="card-title"><%=productEntity.getName()%></h5>
                         <%--<p class="card-text"><%=productEntity.getDescripcion()%></p>--%>
-                        <%if(user != null && !tipo.equals("Admin") && productEntity.getInventario().getCantidad() > 0){%>
-                            <a href="Basket/addProducto?id=<%=productEntity.getID()%>" class="btn btn-primary">Asignar productEntity al carrito</a>
+                        <%if(user != null && !tipo.equals("Admin") && productEntity.getStock().getQuantity() > 0){%>
+                            <a href="Basket/addProducto?id=<%=productEntity.getId()%>" class="btn btn-primary">Asignar productos al carrito</a>
                         <%}%>
-                        <div class="fw-bold">Cantidad disponible: <%=productEntity.getInventario().getCantidad()%></div>
+                        <div class="fw-bold">Cantidad disponible: <%=productEntity.getStock().getQuantity()%></div>
                         <%if(tipo.equals("Admin")){%>
                             <div>
-                                <a href="/eliminarProducto?id=<%=productEntity.getID()%>">eliminar Producto</a>
+                                <a href="/eliminarProducto?id=<%=productEntity.getId()%>">eliminar Producto</a>
                             </div>
                             <div>
-                                <a href="/modificarProducto?id=<%=productEntity.getID()%>">modificar Producto</a>
+                                <a href="/modificarProducto?id=<%=productEntity.getId()%>">modificar Producto</a>
                             </div>
                         <%}%>
-                        <a href="/Detail" class="btn btn-primary">Ver productEntity</a>
+                        <a href="/Detail" class="btn btn-primary">Ver productos</a>
                     </div>
                 </div>
             </div>

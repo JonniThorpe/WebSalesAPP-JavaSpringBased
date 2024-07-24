@@ -25,56 +25,91 @@ donde aparezca ese mismo productEntity y el numero de veces que aparece en el ca
 -->
 <body>
 <%@ include file = "../componentes/Navbar.jsp" %>
-    <form method="post" action="confirmarPedido">
 
-        <div class="container-fluid">
-            <table class="table">
-                <tr>
-                    <th></th>
-                    <th class="col">Nombre</th>
-                    <th class="col">Precio/Unidad</th>
-                    <th class="col">Número Unidades</th>
-                    <th class="col">Precio Total</th>
-                </tr>
-                <%
+<form method="post" action="confirmarPedido">
+    <div class="container-fluid">
+        <table class="table">
+            <tr>
+                <th></th>
+                <th class="col">Nombre</th>
+                <th class="col">Precio/Unidad</th>
+                <th class="col">Número Unidades</th>
+                <th class="col">Precio Total</th>
+            </tr>
+            <%
 
                 double total = 0;
                 int num_productos;
-                    for(Map.Entry<ProductEntity, Integer> mapaProducto: productosCarrito.entrySet()){
-                        ProductEntity productEntity = mapaProducto.getKey();
-                        num_productos= mapaProducto.getValue();
+                for(Map.Entry<ProductEntity, Integer> mapaProducto: productosCarrito.entrySet()){
+                    ProductEntity productEntity = mapaProducto.getKey();
+                    num_productos= mapaProducto.getValue();
 
-                double precio = productEntity.getPrecio();
-                double precio_total=precio * num_productos;
-                %>
-                <tr>
-                    <td><img src="../../img/<%=productEntity.getImagen()%>" width="64" height="64"></td>
-                    <td><%=productEntity.getNombre()%></td>
-                    <td><%=productEntity.getPrecio()%>€</td>
-                    <td>
-                        <select name="cantidad" id="unidades">
-                            <%
-                                for (int i = 0; i <= num_productos; i++) {
-                                    String selected = "";
-                                    if(i == num_productos){
-                                        selected = "selected";
-                                    }
-                            %>
-                            <option value="<%=i%>" <%=selected%> ><%=i%></option>
-                            <%
-                                }%>
-                        </select>
-                        <label for="unidades">uds</label></td>
-                    <td><%=precio_total%></td>
-                </tr>
-                <%total = total+precio_total;}%>
-                <tr>
-                    <td colspan="2">Total</td>
-                    <td ><%=total%>€</td>
-                </tr>
-            </table>
-            <button type="submit" class="btn btn-primary">Realizar orderEntity </button>
-        </div>
-    </form>
+                    double precio = productEntity.getPrecio();
+                    double precio_total=precio * num_productos;
+            %>
+            <tr>
+                <td><img src="../../img/productos/<%=productEntity.getImagen()%>" width="64" height="64"></td>
+                <td><%=productEntity.getNombre()%></td>
+                <td><%=productEntity.getPrecio()%>€</td>
+                <td>
+                    <select name="cantidad" id="unidades">
+                        <%
+                            for (int i = 0; i <= 64; i++) {
+                                String selected = "";
+                                if(i == num_productos){
+                                    selected = "selected";
+                                }
+                        %>
+                        <option value="<%=i%>" <%=selected%> ><%=i%></option>
+                        <%
+                            }%>
+                    </select>
+                    <label for="unidades">uds</label>
+                    <a href="/Basket/deleteProduct?idProduct=<%=productEntity.getID()%>"><img src="../../iconos/bin.png" width="32" height="32"></a>
+                </td>
+                <td><%=precio_total%></td>
+                <td>
+
+                    <a type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal"
+                       data-product-id="<%=productEntity.getID()%>"
+                       data-product-name="<%=productEntity.getNombre()%>"
+                       data-product-price="<%=productEntity.getPrecio()%>"
+                       data-product-quantity="<%=num_productos%>"
+                       data-product-img="<%=productEntity.getImagen()%>">
+                        Modificar Pedido
+                    </a>
+                </td>
+            </tr>
+            <%total = total+precio_total;}%>
+            <tr>
+                <td colspan="2">Total</td>
+                <td ><%=total%>€</td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary">Realizar orderEntity</button>
+    </div>
+</form>
+<%@ include file="../componentes/modal.jsp"%>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('#exampleModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Botón que disparó el modal
+        var productId = button.data('product-id');
+        var productName = button.data('product-name');
+        var productPrice = button.data('product-price');
+        var productQuantity = button.data('product-quantity');
+        var productImg = button.data('product-img'); // Obtener el valor de data-product-img
+
+        // Actualizar el contenido del modal
+        var modal = $(this);
+        modal.find('.modal-title').text('Modificar Pedido para ' + productName);
+        modal.find('#productId').val(productId);
+        modal.find('#product-name').text(productName);
+        modal.find('#product-price').text(productPrice + '€');
+        modal.find('#product-img').attr('src', '../../img/productos/' + productImg); // Actualizar la imagen
+
+        modal.find('#unidades').val(productQuantity);
+    });
+</script>
 </body>
 </html>

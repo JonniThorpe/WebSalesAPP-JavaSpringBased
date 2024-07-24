@@ -1,5 +1,6 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.DTO;
 import com.theenglishcut.dto.Product;
 import jakarta.persistence.*;
 
@@ -7,24 +8,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class ProductEntity {
+public class ProductEntity implements DTO<Product> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID;
 
     private String nombre;
-
     private String descripcion;
-
     private Double precio;
-
     private String imagen;
 
     @ManyToOne
     @JoinColumn(name = "Inventario")
     private StockEntity inventario;
 
-    @OneToMany(mappedBy = "producto",fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "producto", fetch = FetchType.EAGER)
     private List<ProductToOrderEntity> pedidos;
 
     @OneToMany(mappedBy = "producto")
@@ -94,6 +92,7 @@ public class ProductEntity {
         this.nombre = nombre;
     }
 
+    @Override
     public Product toDTO(){
         Product product = new Product();
         product.setId(this.ID);

@@ -1,9 +1,13 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.DTO;
+import com.theenglishcut.dto.ProductToOrder;
 import jakarta.persistence.*;
 
+import java.io.Serializable;
+
 @Entity
-public class ProductToOrderEntity {
+public class ProductToOrderEntity implements DTO<ProductToOrder> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID;
@@ -48,5 +52,16 @@ public class ProductToOrderEntity {
 
     public void setPedido(OrderEntity pedido) {
         this.pedido = pedido;
+    }
+
+    @Override
+    public ProductToOrder toDTO() {
+        ProductToOrder po = new ProductToOrder();
+
+        po.setOrder(this.pedido);
+        po.setProduct(this.producto);
+
+        return po;
+
     }
 }

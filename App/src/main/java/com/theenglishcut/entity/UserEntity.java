@@ -1,9 +1,11 @@
 package com.theenglishcut.entity;
 
+import com.theenglishcut.dto.DTO;
+import com.theenglishcut.dto.User;
 import jakarta.persistence.*;
 
 @Entity
-public class UserEntity {
+public class UserEntity implements DTO<User> {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer ID;
@@ -43,5 +45,15 @@ public class UserEntity {
     public String getPassword(){ return password; }
     public void setPassword(String password){ this.password = password; }
 
+    @Override
+    public User toDTO() {
+        User user = new User();
+        user.setId(this.ID);
+        user.setName(this.nombre);
+        user.setPassword(this.password);
+        user.setRol(this.rol);
+
+        return user;
+    }
 }
 
