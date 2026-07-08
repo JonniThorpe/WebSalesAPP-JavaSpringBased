@@ -24,6 +24,9 @@ public class ProductController {
     private ProductService productService;
 
     @Autowired
+    private ProductoRepository productoRepository;
+
+    @Autowired
     private StockService stockService;
 
     @Autowired
@@ -44,6 +47,7 @@ public class ProductController {
         if(categoryID == 0){
             categoriaGlobal = 0;
             productList = productService.listedProducts();
+            productoRepository.findById(1);
         }else {
             categoriaGlobal = categoryID;
             productList = productService.listedProductsByCategory(categoryID);
@@ -60,14 +64,20 @@ public class ProductController {
     public String verCategorias (HttpSession sesion) {
 
         sesion.setAttribute("categoryListView", categoryService.findAll());
+        Map<ProductEntity,Integer> productosCarrito = (Map<ProductEntity, Integer>) sesion.getAttribute("productosCarrito");
+        if(productosCarrito == null){
+            sesion.setAttribute("productosCarrito",new Hashtable<>());
+        }
         return "/Navbar";
     }
 
     @GetMapping("/Detail")
     public String product_Detail(@RequestParam("id")Integer id, Model modelo){
         Product product = productService.findByProductID(id);
+        List<Product> products = productService.listedProductsByCategories(product.getCategories());
 
         modelo.addAttribute("product", product);
+        modelo.addAttribute("products", products);
         return "/ProductDetail";
     }
 

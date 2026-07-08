@@ -1,7 +1,11 @@
 package com.theenglishcut.controller;
 
 import com.theenglishcut.dao.*;
+import com.theenglishcut.dto.Order;
+import com.theenglishcut.dto.Product;
+import com.theenglishcut.dto.User;
 import com.theenglishcut.entity.*;
+import com.theenglishcut.service.*;
 import com.theenglishcut.ui.productQuantity;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,39 +22,36 @@ import java.util.stream.IntStream;
 public class BasketController {
 
     @Autowired
-    private PedidoRepository pedidoRepository;
+    private OrderService orderService;
     @Autowired
-    private InventarioRepository inventarioRepository;
+    private UserService userService;
     @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
-    private ProductoRepository productoRepository;
-    @Autowired
-    private ProductoAPedidoRepository PedidoaProductoRepository;
+    private ProductService productService;
 
-    Map<ProductEntity,Integer> productosCarrito= new Hashtable<>();
-    private OrderEntity orderEntityCliente = new OrderEntity();
+    Map<Product,Integer> basketProducts= new Hashtable<>();
+    private Order clientOrder = new Order();
 
     @GetMapping("/addProducto")
-    public String addProducto (@RequestParam("id")int id) {
-        ProductEntity productEntity_meter = productoRepository.findById(id).get();//Este va a ser el producto que vamos a meter
+    public String addProducto (@RequestParam("id")int id, HttpSession sesion) {
+        Product addProduct = productService.findByProductID(id);//Este va a ser el producto que vamos a meter
         boolean existe=false;
-        for(ProductEntity productEntity : productosCarrito.keySet()){
-            if(productEntity.getID().equals(productEntity_meter.getID())){
+        for(Product product : basketProducts.keySet()){
+            if(product.getId().equals(addProduct.getId())){
                 existe=true;
-                int unidades = productosCarrito.get(productEntity)+1;
-                productosCarrito.put(productEntity,unidades);
+                int unidades = basketProducts.get(product)+1;
+                basketProducts.put(product,unidades);
             }
         }
         if(!existe){
-            productosCarrito.put(productEntity_meter,1);
+            basketProducts.put(addProduct,1);
         }
+        sesion.setAttribute("basketProducts",basketProducts);
         return "redirect:/listadoProductos?CategoryID=0";
     }
 
     @GetMapping("/confirmarPedidoCliente")
     public String confirmarPedidoCliente (Model model) {
-        model.addAttribute("productosCarrito", productosCarrito);
+        model.addAttribute("basketProducts", basketProducts);
         model.addAttribute("productQuantity", new productQuantity());
 
         model.addAttribute("quantityOptions", IntStream.rangeClosed(0, 64).boxed().collect(Collectors.toList()));
@@ -60,18 +61,18 @@ public class BasketController {
     @PostMapping("/modifyBasketProduct")
     public String modifyBasketProduct(@ModelAttribute("productQuantity") productQuantity productQuantity) {
         // Lógica para manejar la modificación del producto en el carrito
-        for(ProductEntity productEntity : productosCarrito.keySet()){
-            if(productEntity.getID().equals(productQuantity.getProductId())){
-                productosCarrito.put(productEntity,productQuantity.getQuantity());
+        for(Product product : basketProducts.keySet()){
+            if(product.getId().equals(productQuantity.getProductId())){
+                basketProducts.put(product,productQuantity.getQuantity());
             }
         }
         return "redirect:/Basket/confirmarPedidoCliente"; // Redirigir después de manejar la solicitud
     }
     @GetMapping("/deleteProduct")
     public String delete_Product(@RequestParam("idProduct")Integer idProduct) {
-        for(ProductEntity productEntity : productosCarrito.keySet()){
-            if(productEntity.getID().equals(idProduct)){
-                productosCarrito.remove(productEntity);
+        for(Product product : basketProducts.keySet()){
+            if(product.getId().equals(idProduct)){
+                basketProducts.remove(product);
             }
         }
         return "redirect:/Basket/confirmarPedidoCliente";
@@ -85,52 +86,14 @@ public class BasketController {
             // Manejar el caso en que el usuario no esté autenticado
             return "redirect:/login"; // Redirigir a la página de inicio de sesión
         }
-        UserEntity clientePedido = usuarioRepository.findByNombreUser(user.getNombre());
+        User client = userService.findByUsername(user.getNombre());
 
-
-        List<ProductToOrderEntity> productoaPedidoLista = new ArrayList<>();
-
-
-        //Creamos el pedido
-        orderEntityCliente.setUsuario(clientePedido);
-        orderEntityCliente.setFechaCreacion(new Date());
-        orderEntityCliente.setEntregaCompletada(false);
-        pedidoRepository.save(orderEntityCliente);
-
-
-        for(Map.Entry<ProductEntity, Integer> mapaProducto : productosCarrito.entrySet()){
-            ProductEntity productEntityConfirmado = mapaProducto.getKey();
-
-            ProductToOrderEntity productoaPedido = new ProductToOrderEntity();
-
-            productoaPedido.setProducto(productEntityConfirmado);
-            productoaPedido.setPedido(orderEntityCliente);
-            productoaPedido.setCantidad(mapaProducto.getValue());
-
-            PedidoaProductoRepository.save(productoaPedido);
-            productoaPedidoLista.add(productoaPedido);
-
-            productEntityConfirmado.setPedidos(productoaPedidoLista);
-
-            productoRepository.save(productEntityConfirmado);
-
-            StockEntity stockEntityProducto;
-
-            stockEntityProducto = inventarioRepository.findById(productEntityConfirmado.getInventario().getID()).orElse(null);
-            if(stockEntityProducto != null && productEntityConfirmado.getInventario().getCantidad() > 0  ){
-                stockEntityProducto.setCantidad(productEntityConfirmado.getInventario().getCantidad() - mapaProducto.getValue());
-                inventarioRepository.save(stockEntityProducto);
-            }
-
-        }
-        orderEntityCliente.setProductos(productoaPedidoLista);
-
-        pedidoRepository.save(orderEntityCliente);
+        orderService.save(client, clientOrder, basketProducts);
 
         //Limpiamos el carrito para nuevos productos y nuevo pedido
-        productosCarrito.clear();
+        basketProducts.clear();
 
-        orderEntityCliente = new OrderEntity();
+        clientOrder = new Order();
 
         return "redirect:/listadoProductos?CategoryID=0";
     }

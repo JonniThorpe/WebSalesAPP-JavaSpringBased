@@ -11,7 +11,7 @@ public class Order {
     private int id = -1;
     private Date creationDate;
     private Boolean completed = false;
-    private UserEntity user;
+    private User user;
     private List<Integer> products;
     private String address;
 }

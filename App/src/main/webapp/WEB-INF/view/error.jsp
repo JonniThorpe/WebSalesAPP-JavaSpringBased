@@ -39,3 +39,4 @@
 </div>
 </body>
 </html>
+<%@ include file = "../componentes/Footer.jsp" %>

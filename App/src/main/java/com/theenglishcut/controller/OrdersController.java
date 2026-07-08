@@ -36,9 +36,9 @@ public class OrdersController {
         UserEntity userEntity = usuarioRepository.findByNombreUser(user.getNombre());
         List<UserEntity> users = usuarioRepository.findAll();
 
-        if(userEntity.getRol().getNombre().equals("Administrador") && filtro){
+        if(userEntity.getRol().getNombre().equals("Admin") && filtro){
             ordersList = pedidoRepository.findAll();
-        }else if(userEntity.getRol().getNombre().equals("Usuario") || userEntity.getRol().getNombre().equals("Empleado")){
+        }else if(userEntity.getRol().getNombre().equals("User") || userEntity.getRol().getNombre().equals("Employer")){
             ordersList = pedidoRepository.findPedidoByUser(userEntity.getID());
         }
 
@@ -63,4 +63,17 @@ public class OrdersController {
         }
         return "redirect:/Orders/listarPedidos";
     }
+
+    @GetMapping("/delivery")
+    public String deliveryVerification(@RequestParam("completed") Boolean completed, @RequestParam("idOrder")Integer orderId){
+        OrderEntity order = pedidoRepository.findById(orderId).get();
+        if(completed){
+            order.setEntregaCompletada(false);
+        }else{
+            order.setEntregaCompletada(true);
+        }
+        pedidoRepository.save(order);
+        return "redirect:/Orders/listarPedidos";
+    }
+
 }

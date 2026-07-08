@@ -17,7 +17,7 @@
 
 </head>
 <body>
-<%@ include file="../../bootstrap/css-js.jsp"%>
+<%@ include file="../bootstrap/css-js.jsp"%>
 <!--  Incluye el navbar de forma reusable-->
 <%@ include file = "../componentes/Navbar.jsp" %>
 <div id="carouselExampleFade" class="carousel slide carousel-fade">
@@ -66,3 +66,4 @@
 
 </body>
 </html>
+<%@ include file = "../componentes/Footer.jsp" %>

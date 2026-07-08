@@ -9,6 +9,7 @@ import com.theenglishcut.entity.StockEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,6 +36,14 @@ public class ProductService extends DTOService<Product, ProductEntity> {
     public List<Product> listedProductsByCategory(Integer categoryID){
         List<ProductEntity> list = productRepository.findByCategoryID(categoryID);
         return this.entidadesADTO(list);
+    }
+
+    public List<Product> listedProductsByCategories(List<Integer> categoryIDs){
+        List<Product> products = new ArrayList<>();
+        for(Integer categoryID : categoryIDs){
+            products.addAll(this.listedProductsByCategory(categoryID));
+        }
+        return products;
     }
 
     public void deleteProduct(Integer id){

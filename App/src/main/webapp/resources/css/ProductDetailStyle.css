@@ -1,0 +1,64 @@
+.object-wrapper {
+    display: flex;
+    height: fit-content;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .object-div {
+    width: 100%;
+  }
+  
+  .object {
+    padding: 20px;
+    display: inline-block;
+    width: 100%;
+    text-align: center;
+  }
+  html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.grid-container {
+  display: grid;
+  place-items: center;
+  align-content: end;
+  grid-template-columns: auto auto auto;
+  gap: 10px;
+  background-color: #f1f3f5;
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.grid-container > .element-grid {
+  align-self: center;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+
+/*Ajusta el tamaño del card y de la imagen*/
+.card {
+    width: 15rem;
+}
+
+.fixed-img {
+    width: 100%;
+    height: 9rem; /* Altura fija para la imagen */
+    object-fit: cover; /* Asegura que la imagen cubra el espacio establecido */
+}
+
+/* Media queries to hide cards based on screen size */
+@media (max-width: 1208px) {
+  .card-container:nth-child(3) {
+      display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .card-container:nth-child(2) {
+      display: none;
+  }
+}

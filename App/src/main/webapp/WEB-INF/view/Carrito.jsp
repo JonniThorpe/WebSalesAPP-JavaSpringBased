@@ -9,21 +9,12 @@
   To change this template use File | Settings | File Templates.
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%
-
-Map<ProductEntity, Integer> productosCarrito = (Map<ProductEntity, Integer>) request.getAttribute("productosCarrito");
-%>
 <html>
 <head>
     <title>Title</title>
 </head>
-<!--
-TODO Stackear productEntity en cantidad y precio si son el mismo tipo de productEntity
-El listado de productEntities muestra cada productEntity de la lista productosCarrito definida en la parte superior de esta pagina,
-es necesario que aquel productEntity que este en la lista varias veces se muestre en una sola fila en lugar de varias,
-donde aparezca ese mismo productEntity y el numero de veces que aparece en el carrito y un sumatorio del precio del productEntity
--->
 <body>
+<%@ include file="../bootstrap/css-js.jsp"%>
 <%@ include file = "../componentes/Navbar.jsp" %>
 
 <form method="post" action="confirmarPedido">
@@ -40,17 +31,17 @@ donde aparezca ese mismo productEntity y el numero de veces que aparece en el ca
 
                 double total = 0;
                 int num_productos;
-                for(Map.Entry<ProductEntity, Integer> mapaProducto: productosCarrito.entrySet()){
-                    ProductEntity productEntity = mapaProducto.getKey();
+                for(Map.Entry<Product, Integer> mapaProducto: basketProducts.entrySet()){
+                    Product product = mapaProducto.getKey();
                     num_productos= mapaProducto.getValue();
 
-                    double precio = productEntity.getPrecio();
+                    double precio = product.getPrice();
                     double precio_total=precio * num_productos;
             %>
             <tr>
-                <td><img src="../../img/productos/<%=productEntity.getImagen()%>" width="64" height="64"></td>
-                <td><%=productEntity.getNombre()%></td>
-                <td><%=productEntity.getPrecio()%>€</td>
+                <td><img src="../../img/productos/<%=product.getImage()%>" width="64" height="64"></td>
+                <td><%=product.getName()%></td>
+                <td><%=product.getPrice()%>€</td>
                 <td>
                     <select name="cantidad" id="unidades">
                         <%
@@ -65,17 +56,17 @@ donde aparezca ese mismo productEntity y el numero de veces que aparece en el ca
                             }%>
                     </select>
                     <label for="unidades">uds</label>
-                    <a href="/Basket/deleteProduct?idProduct=<%=productEntity.getID()%>"><img src="../../iconos/bin.png" width="32" height="32"></a>
+                    <a href="/Basket/deleteProduct?idProduct=<%=product.getId()%>"><img src="../../iconos/bin.png" width="32" height="32"></a>
                 </td>
                 <td><%=precio_total%></td>
                 <td>
 
                     <a type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal"
-                       data-product-id="<%=productEntity.getID()%>"
-                       data-product-name="<%=productEntity.getNombre()%>"
-                       data-product-price="<%=productEntity.getPrecio()%>"
+                       data-product-id="<%=product.getId()%>"
+                       data-product-name="<%=product.getName()%>"
+                       data-product-price="<%=product.getPrice()%>"
                        data-product-quantity="<%=num_productos%>"
-                       data-product-img="<%=productEntity.getImagen()%>">
+                       data-product-img="<%=product.getImage()%>">
                         Modificar Pedido
                     </a>
                 </td>
@@ -112,4 +103,7 @@ donde aparezca ese mismo productEntity y el numero de veces que aparece en el ca
     });
 </script>
 </body>
+<footer>
+    <%@ include file = "../componentes/Footer.jsp" %>
+</footer>
 </html>

@@ -16,7 +16,7 @@
     <title>Producto</title>
 </head>
 <body>
-
+    <%@ include file="../bootstrap/css-js.jsp"%>
     <%@ include file = "../componentes/Navbar.jsp" %>
 
     <div class="p-5">
@@ -67,7 +67,17 @@
                         <%if(user != null && !tipo.equals("Admin") && productEntity.getStock().getQuantity() > 0){%>
                             <a href="Basket/addProducto?id=<%=productEntity.getId()%>" class="btn btn-primary">Asignar productos al carrito</a>
                         <%}%>
+                        <%
+                            String disabled;
+                            if(productEntity.getStock().getQuantity() > 0){
+                            disabled ="";
+                        %>
                         <div class="fw-bold">Cantidad disponible: <%=productEntity.getStock().getQuantity()%></div>
+                        <%}else{
+                            disabled = "disabled";
+                        %>
+                            <div class="fw-bold bg-danger-subtle rounded mb-1">Producto sin stock</div>
+                        <%}%>
                         <%if(tipo.equals("Admin")){%>
                             <div>
                                 <a href="/eliminarProducto?id=<%=productEntity.getId()%>">eliminar Producto</a>
@@ -76,7 +86,7 @@
                                 <a href="/modificarProducto?id=<%=productEntity.getId()%>">modificar Producto</a>
                             </div>
                         <%}%>
-                        <a href="/Detail" class="btn btn-primary">Ver productos</a>
+                        <a href="/Detail?id=<%=productEntity.getId()%>" class="btn btn-primary <%=disabled%>">Ver producto</a>
                     </div>
                 </div>
             </div>
@@ -84,7 +94,10 @@
         </div>
     </div>
     <%}else{%>
-        <h1><%=mensaje%></h1>
+        <h1 class="self-align-center"><%=mensaje%></h1>
     <%}%>
 </body>
+<footer>
+    <%@ include file = "../componentes/Footer.jsp" %>
+</footer>
 </html>

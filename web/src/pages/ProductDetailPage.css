@@ -1,0 +1,30 @@
+.product-detail {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.product-detail img {
+  width: 320px;
+  max-width: 100%;
+  border-radius: 8px;
+  object-fit: cover;
+  aspect-ratio: 4 / 3;
+}
+
+.product-detail__info {
+  flex: 1;
+  min-width: 260px;
+}
+
+.product-detail__price {
+  font-family: var(--font-mono);
+  color: var(--color-accent-secondary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.product-detail__out,
+.product-detail__error {
+  color: var(--color-danger);
+}

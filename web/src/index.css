@@ -1,0 +1,15 @@
+@import './styles/tokens.css';
+
+.page {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page__content {
+  flex: 1;
+  padding: var(--space-4) var(--space-3);
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}

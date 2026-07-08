@@ -69,9 +69,22 @@
                     </td>
                     <td><%=orderEntity.getFechaCreacion().toString()%></td>
                     <%if(orderEntity.isEntregaCompletada()){%>
-                    <td>Entrega completada</td>
+                        <%if(user.getRol().getID() != 1){%>
+                        <td>Entrega completada</td>
+                        <%}else{%>
+                            <td>
+                                <a href="<%= request.getContextPath() %>/Orders/delivery?completed=<%=orderEntity.isEntregaCompletada()%>&idOrder=<%=orderEntity.getID()%>" class="btn btn-success">Entrega Completada</a>
+                            </td>
+                        <%}%>
                     <%}else{%>
-                    <td>Entrega no completada</td>
+
+                        <%if(user.getRol().getID() != 1){%>
+                            <td>Entrega no completada</td>
+                        <%}else{%>
+                            <td>
+                                <a href="<%= request.getContextPath() %>/Orders/delivery?completed=<%=orderEntity.isEntregaCompletada()%>&idOrder=<%=orderEntity.getID()%>" class="btn btn-danger">Entrega no completada</a>
+                            </td>
+                        <%}%>
                     <%}%>
                 </tr>
                 <%}%>
@@ -81,4 +94,5 @@
 <h1><%=mensaje%></h1>
 <%}%>
 </body>
+<%@ include file = "../componentes/Footer.jsp" %>
 </html>

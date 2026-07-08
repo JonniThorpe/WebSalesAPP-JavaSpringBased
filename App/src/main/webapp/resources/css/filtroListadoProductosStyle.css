@@ -1,0 +1,18 @@
+.filter-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-right: 1px solid #dee2e6;
+    overflow-y: auto;
+}
+.filter-title {
+    margin-bottom: 15px;
+}
+.content-container {
+    margin-left: 270px; /* Adjust this based on the width of the filter */
+    padding: 20px;
+}

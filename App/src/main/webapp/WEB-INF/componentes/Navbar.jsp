@@ -1,20 +1,29 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.util.Map" %>
 <%@ page import="com.theenglishcut.entity.UserEntity" %>
-<%@ page import="com.theenglishcut.entity.CategoryEntity" %>
 <%@ page import="com.theenglishcut.dto.Category" %>
-
+<%@ page import="com.theenglishcut.entity.ProductEntity" %>
+<%@ page import="com.theenglishcut.dto.Product" %>
 
 <%
-    UserEntity user = (UserEntity) session.getAttribute("user");
-    String tipo = "User";
-    if(user != null){
-        tipo = user.getRol().getNombre();
-    }
+UserEntity user = (UserEntity) session.getAttribute("user");
+String tipo = "User";
+if(user != null){
+tipo = user.getRol().getNombre();
+}
 
-    List<Category> categoryListView = (List<Category>) session.getAttribute("categoryListView");
+List<Category> categoryListView = (List<Category>) session.getAttribute("categoryListView");
+    Map<Product,Integer> basketProducts = (Map<Product, Integer>) session.getAttribute("basketProducts");
+    Integer numProducts = 0;
+    if(basketProducts != null){
+        for(Integer numberOfProducts :basketProducts.values()){
+            numProducts += numberOfProducts;
+        }
+    }
 %>
 
+<%@ include file="../bootstrap/css-js.jsp"%>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 <nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark border-bottom border-body" data-bs-theme="dark">
@@ -52,15 +61,15 @@
                         <%}%>
                     </ul>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link disabled" aria-disabled="true">Disabled</a>
-                </li>
             </ul>
             <div class="text-center">
                 <div class="row align-items-center">
                     <div class="col">
-                        <a class="align-middle" href="Basket/confirmarPedidoCliente">
+                        <a class="align-middle position-relative" href="<%= request.getContextPath() %>/Basket/confirmarPedidoCliente">
                             <img src="../../iconos/carros.png"/>
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill text-bg-danger">
+                                <%=numProducts%>
+                                <span class="visually-hidden">unread messages</span></span>
                         </a>
                     </div>
                     <div class="col">

@@ -2,7 +2,9 @@ package com.theenglishcut.controller;
 
 import com.theenglishcut.dao.*;
 import com.theenglishcut.dto.Category;
+import com.theenglishcut.dto.Product;
 import com.theenglishcut.entity.CategoryEntity;
+import com.theenglishcut.entity.ProductEntity;
 import com.theenglishcut.entity.UserEntity;
 import com.theenglishcut.service.CategoryService;
 import jakarta.servlet.http.HttpSession;
@@ -14,7 +16,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 public class LoginController {
@@ -55,9 +59,13 @@ public class LoginController {
 
         sesion.setAttribute("user", userEntity);
 
-        //TODO el carrito debe estar vacio cuanddo un nuevo usuario se logee
-        //productosCarrito.clear();
-
+        //control del carrito
+        Map<Product,Integer> basketProducts = (Map<Product, Integer>) sesion.getAttribute("basketProducts");
+        if(basketProducts != null){
+            basketProducts.clear();
+        }else {
+            sesion.setAttribute("basketProducts", new Hashtable<>());
+        }
         return "redirect:/";
     }
 
@@ -104,8 +112,7 @@ public class LoginController {
         //designamoos como el nuevo usuario en uso para la web
         sesion.setAttribute("user", userEntity);
 
-        //TODO el carrito debe estar vacio cuanddo un nuevo usuario se registre
-        //productosCarrito.clear();
+        sesion.setAttribute("basketProducts", new Hashtable<>());
 
         return "redirect:/";
     }
@@ -114,7 +121,7 @@ public class LoginController {
     public String logout (HttpSession sesion) {
 
         sesion.setAttribute("user",null);
-
+        sesion.setAttribute("basketProducts",new Hashtable<>());
         return "redirect:/";
     }
 
@@ -130,8 +137,11 @@ public class LoginController {
      */
     @GetMapping("/")
     public String doInicio (HttpSession sesion) {
-        List<Category> categoryList = categoryService.findAll();
-        sesion.setAttribute("categoryListView", categoryList);
+        sesion.setAttribute("categoryListView", categoryService.findAll());
+        Map<Product,Integer> basketProducts = (Map<Product, Integer>) sesion.getAttribute("basketProducts");
+        if(basketProducts == null){
+            sesion.setAttribute("basketProducts", new Hashtable<>());
+        }
         return "/home";
     }
 }
